@@ -1,0 +1,5 @@
+{
+  "name": "Image Creator (Dev T)",
+  "description": "An application that allows users to generate AI-based images using Gemini. Users can upload an image, provide descriptions for the character and background, and generate creative variations.",
+  "requestFramePermissions": []
+}
