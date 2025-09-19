@@ -1,4 +1,3 @@
-
 import React, { useCallback, useState } from 'react';
 import { ToggleSwitch } from './ToggleSwitch';
 import { UploadIcon } from '../constants';
@@ -54,8 +53,16 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
     e.target.value = '';
   }, [setState]);
   
-  const handleClearFiles = useCallback(() => {
-    setState(s => ({ ...s, uploadedFiles: [] }));
+  const handleClearAll = useCallback(() => {
+    setState({
+      uploadedFiles: [],
+      characterPrompt: '',
+      backgroundPrompt: '',
+      removeBackground: false,
+      width: 0,
+      height: 0,
+      aspectRatio: '9:16',
+    });
     setPreviews([]);
     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
     if (fileInput) {
@@ -74,6 +81,16 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
   };
   
   const isUploadDisabled = state.uploadedFiles.length >= MAX_FILES;
+  
+  const isFormDirty =
+    state.uploadedFiles.length > 0 ||
+    state.characterPrompt !== '' ||
+    state.backgroundPrompt !== '' ||
+    state.width > 0 ||
+    state.height > 0 ||
+    state.removeBackground ||
+    state.aspectRatio !== '9:16';
+
 
   return (
     <div className="bg-gray-900/50 backdrop-blur-md p-6 rounded-2xl shadow-2xl space-y-6 border border-secondary/20">
@@ -82,13 +99,13 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
           <label className="block text-accent font-semibold">
             Upload Image(s) ({state.uploadedFiles.length}/{MAX_FILES})
           </label>
-          {previews.length > 0 && (
+          {isFormDirty && (
             <button 
-              onClick={handleClearFiles} 
+              onClick={handleClearAll} 
               className="text-sm text-secondary hover:text-accent underline focus:outline-none"
-              aria-label="Clear uploaded files"
+              aria-label="Clear all form inputs"
             >
-              Clear
+              Clear All
             </button>
           )}
         </div>
