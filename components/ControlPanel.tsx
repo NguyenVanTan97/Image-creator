@@ -1,3 +1,4 @@
+
 import React, { useCallback, useState } from 'react';
 import { ToggleSwitch } from './ToggleSwitch';
 import { UploadIcon } from '../constants';
@@ -62,7 +63,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
     }
   }, [setState]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setState(s => ({ ...s, [name]: value }));
   };
@@ -75,7 +76,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
   const isUploadDisabled = state.uploadedFiles.length >= MAX_FILES;
 
   return (
-    <div className="bg-primary/30 backdrop-blur-md p-6 rounded-2xl shadow-2xl space-y-6 border border-white/20">
+    <div className="bg-gray-900/50 backdrop-blur-md p-6 rounded-2xl shadow-2xl space-y-6 border border-secondary/20">
       <div>
         <div className="flex justify-between items-center mb-2">
           <label className="block text-accent font-semibold">
@@ -84,14 +85,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
           {previews.length > 0 && (
             <button 
               onClick={handleClearFiles} 
-              className="text-sm text-accent hover:text-white underline focus:outline-none"
+              className="text-sm text-secondary hover:text-accent underline focus:outline-none"
               aria-label="Clear uploaded files"
             >
               Clear
             </button>
           )}
         </div>
-        <div className="bg-primary/50 p-2 rounded-lg min-h-[10rem] flex items-center">
+        <div className="bg-black/20 p-2 rounded-lg min-h-[10rem] flex items-center">
           <div className="flex items-center space-x-4 overflow-x-auto w-full">
             {previews.map((src, index) => (
               <div key={index} className="flex-shrink-0 h-32 w-32">
@@ -101,7 +102,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
             {!isUploadDisabled && (
               <label 
                 htmlFor="file-upload" 
-                className="flex-shrink-0 w-32 h-32 flex flex-col items-center justify-center border-2 border-accent border-dashed rounded-lg cursor-pointer hover:bg-accent/20 transition text-accent"
+                className="flex-shrink-0 w-32 h-32 flex flex-col items-center justify-center border-2 border-secondary/50 border-dashed rounded-lg cursor-pointer hover:bg-secondary/10 transition text-secondary"
                 aria-label="Upload more images"
               >
                 {UploadIcon}
@@ -126,7 +127,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
           rows={3}
           value={state.characterPrompt}
           onChange={handleInputChange}
-          className="w-full bg-primary/50 border border-secondary rounded-lg p-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition"
+          className="w-full bg-black/20 border border-secondary/50 rounded-lg p-3 text-accent placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition"
           placeholder={state.removeBackground ? "e.g., make the person wear glasses" : "e.g., a futuristic knight with glowing armor"}
         />
       </div>
@@ -140,22 +141,23 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
             rows={3}
             value={state.backgroundPrompt}
             onChange={handleInputChange}
-            className="w-full bg-primary/50 border border-secondary rounded-lg p-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition"
+            className="w-full bg-black/20 border border-secondary/50 rounded-lg p-3 text-accent placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition"
             placeholder="e.g., a mystical forest at night with two moons"
             disabled={state.removeBackground}
           />
         </div>
 
-        <div className="flex gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label htmlFor="width" className="block text-accent font-semibold mb-2">Width (px)</label>
             <input
               type="number"
               id="width"
               name="width"
-              value={state.width}
+              value={state.width || ''}
               onChange={handleDimensionChange}
-              className="w-full bg-primary/50 border border-secondary rounded-lg p-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition"
+              placeholder="Auto"
+              className="w-full bg-black/20 border border-secondary/50 rounded-lg p-3 text-accent placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition"
               disabled={state.removeBackground}
             />
           </div>
@@ -165,11 +167,29 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
               type="number"
               id="height"
               name="height"
-              value={state.height}
+              value={state.height || ''}
               onChange={handleDimensionChange}
-              className="w-full bg-primary/50 border border-secondary rounded-lg p-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition"
+              placeholder="Auto"
+              className="w-full bg-black/20 border border-secondary/50 rounded-lg p-3 text-accent placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition"
               disabled={state.removeBackground}
             />
+          </div>
+           <div>
+            <label htmlFor="aspectRatio" className="block text-accent font-semibold mb-2">Aspect Ratio</label>
+            <select
+              id="aspectRatio"
+              name="aspectRatio"
+              value={state.aspectRatio}
+              onChange={handleInputChange}
+              disabled={state.removeBackground || state.width > 0 || state.height > 0}
+              className="w-full bg-black/20 border border-secondary/50 rounded-lg p-3 text-accent focus:ring-2 focus:ring-secondary focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option value="9:16">9:16 (Vertical)</option>
+              <option value="16:9">16:9 (Horizontal)</option>
+              <option value="1:1">1:1 (Square)</option>
+              <option value="3:4">3:4 (Portrait)</option>
+              <option value="4:6">4:6 (Portrait)</option>
+            </select>
           </div>
         </div>
       </div>
@@ -177,7 +197,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ state, setState, onG
       <button
         onClick={onGenerate}
         disabled={isLoading || state.uploadedFiles.length === 0}
-        className="w-full py-3 px-4 text-lg font-bold rounded-lg transition-all duration-300 ease-in-out bg-gradient-to-r from-accent to-white text-primary shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+        className="w-full py-3 px-4 text-lg font-bold rounded-lg transition-all duration-300 ease-in-out bg-gradient-to-r from-primary to-accent text-black shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
       >
         {isLoading ? 'Generating...' : 'Generate'}
       </button>

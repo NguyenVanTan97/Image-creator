@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Modality, Part } from "@google/genai";
 
 const fileToGenerativePart = async (file: File): Promise<Part> => {
@@ -15,7 +16,10 @@ export const generateImageVariations = async (
   baseImages: File[],
   characterPrompt: string,
   backgroundPrompt: string,
-  removeBackground: boolean
+  removeBackground: boolean,
+  width: number,
+  height: number,
+  aspectRatio: string
 ): Promise<string[]> => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
@@ -38,6 +42,11 @@ export const generateImageVariations = async (
     }
     if (backgroundPrompt) {
       fullPrompt += ` Background, space, etc.: ${backgroundPrompt}.`;
+    }
+    if (width > 0 && height > 0) {
+      fullPrompt += ` The output image must be exactly ${width}px by ${height}px. It is critical to adhere to these dimensions.`;
+    } else if (aspectRatio) {
+      fullPrompt += ` It is absolutely critical that the final output image has an aspect ratio of ${aspectRatio}. Recompose the image, extend the scenery, or crop if necessary to strictly meet this ${aspectRatio} aspect ratio. Do not deviate from this aspect ratio.`;
     }
   }
 

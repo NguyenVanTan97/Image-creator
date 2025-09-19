@@ -1,6 +1,8 @@
+
 import React, { useState, useCallback } from 'react';
 import { ControlPanel } from './components/ControlPanel';
 import { ResultsPanel } from './components/ResultsPanel';
+import { ImagePreviewModal } from './components/ImagePreviewModal';
 import { generateImageVariations } from './services/geminiService';
 import { FacebookIcon } from './constants';
 import type { ControlPanelState } from './types';
@@ -11,13 +13,15 @@ const App: React.FC = () => {
     characterPrompt: '',
     backgroundPrompt: '',
     removeBackground: false,
-    width: 1024,
-    height: 1024,
+    width: 0,
+    height: 0,
+    aspectRatio: '9:16',
   });
 
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleGenerate = useCallback(async () => {
     if (controlState.uploadedFiles.length === 0) {
@@ -34,7 +38,10 @@ const App: React.FC = () => {
         controlState.uploadedFiles,
         controlState.characterPrompt,
         controlState.backgroundPrompt,
-        controlState.removeBackground
+        controlState.removeBackground,
+        controlState.width,
+        controlState.height,
+        controlState.aspectRatio
       );
       setGeneratedImages(imageUrls);
     } catch (err) {
@@ -46,14 +53,14 @@ const App: React.FC = () => {
   }, [controlState]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-white text-white font-sans">
-      <header className="p-4 flex justify-between items-center shadow-lg bg-primary/50 backdrop-blur-sm">
-        <h1 className="text-2xl md:text-3xl font-bold text-accent">Image Creator (Dev T)</h1>
+    <div className="min-h-screen bg-dark-bg text-accent font-sans">
+      <header className="p-4 flex justify-between items-center shadow-lg bg-gray-900/50 backdrop-blur-sm">
+        <h1 className="text-2xl md:text-3xl font-bold text-secondary">Image Creator (Dev T)</h1>
         <a
           href="https://www.facebook.com/97.Dev.T"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 bg-accent text-primary px-4 py-2 rounded-lg font-semibold hover:bg-white transition-transform transform hover:scale-105"
+          className="flex items-center gap-2 bg-secondary text-dark-bg px-4 py-2 rounded-lg font-semibold hover:bg-secondary/80 transition-transform transform hover:scale-105"
         >
           {FacebookIcon}
           <span className="hidden sm:inline">Dev T</span>
@@ -72,9 +79,17 @@ const App: React.FC = () => {
             images={generatedImages}
             isLoading={isLoading}
             error={error}
+            onImageSelect={setSelectedImage}
           />
         </div>
       </main>
+
+      {selectedImage && (
+        <ImagePreviewModal 
+          imageUrl={selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   );
 };

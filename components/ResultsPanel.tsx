@@ -1,4 +1,3 @@
-
 import React, { useCallback } from 'react';
 import { DownloadIcon } from '../constants';
 
@@ -6,27 +5,42 @@ interface ResultsPanelProps {
   images: string[];
   isLoading: boolean;
   error: string | null;
+  onImageSelect: (url: string) => void;
 }
 
-const ImageCard: React.FC<{ src: string, index: number, onDownload: () => void }> = ({ src, index, onDownload }) => (
-  <div className="relative group aspect-square bg-primary/20 rounded-lg overflow-hidden shadow-lg">
-    <img src={src} alt={`Generated result ${index + 1}`} className="w-full h-full object-cover" />
-    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-      <button 
-        onClick={onDownload} 
-        className="bg-accent text-primary px-4 py-2 rounded-lg font-semibold hover:bg-white transition-transform transform hover:scale-105"
-      >
-        Download
-      </button>
-    </div>
+const ImageCard: React.FC<{ 
+  src: string; 
+  index: number; 
+  onDownload: () => void;
+  onSelect: () => void;
+}> = ({ src, index, onDownload, onSelect }) => (
+  <div className="relative aspect-square bg-black/20 rounded-lg overflow-hidden shadow-lg">
+    <img 
+      src={src} 
+      alt={`Generated result ${index + 1}`} 
+      className="w-full h-full object-cover cursor-pointer"
+      onClick={onSelect}
+    />
+    <button 
+      onClick={(e) => {
+        e.stopPropagation(); // Prevent the image click from firing
+        onDownload();
+      }} 
+      className="absolute top-2 right-2 bg-secondary text-accent p-2 rounded-full font-semibold hover:bg-secondary/80 transition-transform transform hover:scale-110 shadow-lg focus:outline-none focus:ring-2 focus:ring-accent"
+      aria-label={`Download image ${index + 1}`}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+    </button>
   </div>
 );
 
 const SkeletonLoader: React.FC = () => (
-  <div className="animate-pulse bg-primary/20 rounded-lg aspect-square"></div>
+  <div className="animate-pulse bg-black/20 rounded-lg aspect-square"></div>
 );
 
-export const ResultsPanel: React.FC<ResultsPanelProps> = ({ images, isLoading, error }) => {
+export const ResultsPanel: React.FC<ResultsPanelProps> = ({ images, isLoading, error, onImageSelect }) => {
   
   const downloadImage = useCallback((url: string, filename: string) => {
     const link = document.createElement('a');
@@ -69,6 +83,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ images, isLoading, e
               src={src} 
               index={index} 
               onDownload={() => downloadImage(src, `generated-image-${index + 1}.png`)} 
+              onSelect={() => onImageSelect(src)}
             />
           ))}
         </div>
@@ -76,21 +91,21 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ images, isLoading, e
     }
 
     return (
-      <div className="flex items-center justify-center h-full border-2 border-dashed border-accent/50 rounded-lg">
-        <p className="text-accent/80">Your generated images will appear here</p>
+      <div className="flex items-center justify-center h-full border-2 border-dashed border-secondary/50 rounded-lg">
+        <p className="text-secondary/80">Your generated images will appear here</p>
       </div>
     );
   };
 
   return (
-    <div className="bg-primary/30 backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-white/20 h-full flex flex-col">
+    <div className="bg-gray-900/50 backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-secondary/20 h-full flex flex-col">
       <div className="flex-grow min-h-[300px] lg:min-h-0">
         {renderContent()}
       </div>
       {images.length > 0 && !isLoading && (
         <button
           onClick={handleDownloadAll}
-          className="mt-6 w-full py-3 px-4 flex items-center justify-center bg-accent text-primary text-lg font-bold rounded-lg hover:bg-white transition-transform transform hover:scale-105"
+          className="mt-6 w-full py-3 px-4 flex items-center justify-center bg-gradient-to-r from-primary to-accent text-black text-lg font-bold rounded-lg hover:shadow-2xl transition-all transform hover:scale-105"
         >
           {DownloadIcon}
           Download All

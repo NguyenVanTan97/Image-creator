@@ -6,4 +6,5 @@ export interface ControlPanelState {
   removeBackground: boolean;
   width: number;
   height: number;
+  aspectRatio: string;
 }
