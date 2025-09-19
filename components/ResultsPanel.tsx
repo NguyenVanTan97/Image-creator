@@ -5,7 +5,7 @@ interface ResultsPanelProps {
   images: string[];
   isLoading: boolean;
   error: string | null;
-  onImageSelect: (url: string) => void;
+  onImageSelect: (index: number) => void;
 }
 
 const ImageCard: React.FC<{ 
@@ -83,7 +83,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ images, isLoading, e
               src={src} 
               index={index} 
               onDownload={() => downloadImage(src, `generated-image-${index + 1}.png`)} 
-              onSelect={() => onImageSelect(src)}
+              onSelect={() => onImageSelect(index)}
             />
           ))}
         </div>

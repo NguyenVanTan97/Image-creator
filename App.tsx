@@ -21,7 +21,7 @@ const App: React.FC = () => {
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
   const handleGenerate = useCallback(async () => {
     if (controlState.uploadedFiles.length === 0) {
@@ -52,6 +52,22 @@ const App: React.FC = () => {
     }
   }, [controlState]);
 
+  const handleNextImage = useCallback(() => {
+    if (selectedImageIndex !== null) {
+      setSelectedImageIndex((prevIndex) => 
+        prevIndex === null ? 0 : (prevIndex + 1) % generatedImages.length
+      );
+    }
+  }, [selectedImageIndex, generatedImages.length]);
+
+  const handlePrevImage = useCallback(() => {
+    if (selectedImageIndex !== null) {
+      setSelectedImageIndex((prevIndex) => 
+        prevIndex === null ? 0 : (prevIndex - 1 + generatedImages.length) % generatedImages.length
+      );
+    }
+  }, [selectedImageIndex, generatedImages.length]);
+
   return (
     <div className="min-h-screen bg-dark-bg text-accent font-sans">
       <header className="p-4 flex justify-between items-center shadow-lg bg-gray-900/50 backdrop-blur-sm">
@@ -79,15 +95,18 @@ const App: React.FC = () => {
             images={generatedImages}
             isLoading={isLoading}
             error={error}
-            onImageSelect={setSelectedImage}
+            onImageSelect={setSelectedImageIndex}
           />
         </div>
       </main>
 
-      {selectedImage && (
+      {selectedImageIndex !== null && generatedImages.length > 0 && (
         <ImagePreviewModal 
-          imageUrl={selectedImage}
-          onClose={() => setSelectedImage(null)}
+          images={generatedImages}
+          currentIndex={selectedImageIndex}
+          onClose={() => setSelectedImageIndex(null)}
+          onNext={handleNextImage}
+          onPrev={handlePrevImage}
         />
       )}
     </div>
